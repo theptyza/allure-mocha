@@ -27,34 +27,34 @@ function AllureReporter(runner, opts) {
         };
     }
 
-    runner.on("suite", invokeHandler(function (suite) {
-        allureReporter.startSuite(suite.fullTitle());
+    runner.on("suite", invokeHandler(function (suite, timestamp) {
+        allureReporter.startSuite(suite.fullTitle(), timestamp);
     }));
 
     runner.on("suite end", invokeHandler(function () {
         allureReporter.endSuite();
     }));
 
-    runner.on("test", invokeHandler(function(test) {
+    runner.on("test", invokeHandler(function(test, timestamp) {
         if (typeof test.currentRetry !== "function" || !test.currentRetry()) {
-          allureReporter.startCase(test.title);
+          allureReporter.startCase(test.title, timestamp);
         }
     }));
 
-    runner.on("pending", invokeHandler(function(test) {
+    runner.on("pending", invokeHandler(function(test, timestamp) {
         var currentTest = allureReporter.getCurrentTest();
         if(currentTest && currentTest.name === test.title) {
-            allureReporter.endCase("skipped");
+            allureReporter.endCase("skipped", null, timestamp);
         } else {
-            allureReporter.pendingCase(test.title);
+            allureReporter.pendingCase(test.title, timestamp);
         }
     }));
 
-    runner.on("pass", invokeHandler(function() {
-        allureReporter.endCase("passed");
+    runner.on("pass", invokeHandler(function(timestamp) {
+        allureReporter.endCase("passed", null, timestamp);
     }));
 
-    runner.on("fail", invokeHandler(function(test, err) {
+    runner.on("fail", invokeHandler(function(test, err, timestamp) {
         if(!allureReporter.getCurrentTest()) {
             allureReporter.startCase(test.title);
         }
@@ -63,7 +63,7 @@ function AllureReporter(runner, opts) {
         if(global.onError) {
             global.onError(err);
         }
-        allureReporter.endCase(status, err);
+        allureReporter.endCase(status, err, timestamp);
     }));
 
     runner.on("hook end", invokeHandler(function(hook) {
