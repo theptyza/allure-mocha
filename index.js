@@ -50,7 +50,7 @@ function AllureReporter(runner, opts) {
         }
     }));
 
-    runner.on("pass", invokeHandler(function(timestamp) {
+    runner.on("pass", invokeHandler(function(test, timestamp) {
         allureReporter.endCase("passed", null, timestamp);
     }));
 
