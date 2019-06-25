@@ -31,8 +31,8 @@ function AllureReporter(runner, opts) {
         allureReporter.startSuite(suite.fullTitle(), timestamp);
     }));
 
-    runner.on("suite end", invokeHandler(function () {
-        allureReporter.endSuite();
+    runner.on("suite end", invokeHandler(function (suite, timestamp) {
+        allureReporter.endSuite(timestamp);
     }));
 
     runner.on("test", invokeHandler(function(test, timestamp) {
@@ -56,7 +56,7 @@ function AllureReporter(runner, opts) {
 
     runner.on("fail", invokeHandler(function(test, err, timestamp) {
         if(!allureReporter.getCurrentTest()) {
-            allureReporter.startCase(test.title);
+            allureReporter.startCase(test.title, timestamp);
         }
         var isAssertionError = err.name === "AssertionError" || err.code === "ERR_ASSERTION";
         var status = isAssertionError ? "failed" : "broken";
